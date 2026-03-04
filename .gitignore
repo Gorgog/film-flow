@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Environment (секреты!)
+apps/backend/.env
+apps/backend/.env.local
+apps/frontend/.env
+apps/frontend/.env.local
+apps/frontend/.env.production
+
+# Build output
+apps/backend/dist/
+apps/frontend/dist/
+build/
+
+# Cache & logs
+.vite/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Optional: локальные настройки
+*.local

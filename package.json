@@ -1,0 +1,16 @@
+{
+  "name": "film-flow",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Мой личный трекер фильмов и сериалов",
+  "main": "index.js",
+  "scripts": {
+    "dev": "pnpm --parallel run dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.3"
+}
