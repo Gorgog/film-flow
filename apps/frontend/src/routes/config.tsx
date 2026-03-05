@@ -4,7 +4,10 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { createBrowserRouter } from 'react-router-dom';
 
 import { BaseLayout } from '@/layout/BaseLayout';
+import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
+import { HomePage } from '@/pages/home/HomePage';
+
 export const router = createBrowserRouter([
   {
     element: <GuestOnlyRoute />,
@@ -13,7 +16,7 @@ export const router = createBrowserRouter([
         element: <ClearLayout />,
         children: [
           { path: '/register', element: <RegisterPage /> },
-          { path: '/login', element: <div>Login</div> },
+          { path: '/login', element: <LoginPage /> },
         ],
       },
     ],
@@ -23,7 +26,12 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <BaseLayout />,
-        children: [{ path: '/', element: <div>Home</div> }],
+        children: [
+          {
+            path: '/',
+            element: <HomePage />,
+          },
+        ],
       },
     ],
   },

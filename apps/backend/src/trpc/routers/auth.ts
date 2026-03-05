@@ -1,12 +1,8 @@
-import { TRPCError } from '@trpc/server';
 import { supabase } from '@/lib/supabase';
-import {
-  protectedProcedure,
-  publicProcedure,
-  router,
-} from '@/trpc/trpc';
+import { protectedProcedure, publicProcedure, router } from '@/trpc/trpc';
 import { loginSchema, registerSchema } from '@film-flow/shared/auth';
 import type { User } from '@film-flow/shared/types';
+import { TRPCError } from '@trpc/server';
 
 function toUser(u: { id: string; email?: string }): NonNullable<User> {
   return { id: u.id, email: u.email ?? undefined };
@@ -16,19 +12,37 @@ export const authRouter = router({
   register: publicProcedure
     .input(registerSchema)
     .mutation(async ({ input }) => {
-      const { data, error } = await supabase.auth.admin.createUser({
+      const { error: createError } = await supabase.auth.admin.createUser({
         email: input.email,
         password: input.password,
         email_confirm: true,
         user_metadata: { full_name: input.fullName },
       });
-      if (error) {
+      if (createError) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: error.message,
+          message: createError.message,
         });
       }
-      return { user: toUser(data.user) };
+
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: input.email,
+          password: input.password,
+        });
+      const session = signInData.session;
+      const user = signInData.user;
+      if (signInError || !session || !user) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Пользователь создан, но не удалось войти',
+        });
+      }
+      return {
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        user: toUser(user),
+      };
     }),
 
   login: publicProcedure.input(loginSchema).mutation(async ({ input }) => {
@@ -43,7 +57,8 @@ export const authRouter = router({
       });
     }
     const session = data.session;
-    if (!session) {
+    const user = data.user;
+    if (!session || !user) {
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Сессия не создана',
@@ -52,7 +67,7 @@ export const authRouter = router({
     return {
       access_token: session.access_token,
       refresh_token: session.refresh_token,
-      user: toUser(data.user),
+      user: toUser(user),
     };
   }),
 
@@ -78,7 +93,8 @@ export const authRouter = router({
         });
       }
       const session = data.session;
-      if (!session) {
+      const user = data.user;
+      if (!session || !user) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
           message: 'Не удалось обновить сессию',
@@ -87,7 +103,7 @@ export const authRouter = router({
       return {
         access_token: session.access_token,
         refresh_token: session.refresh_token,
-        user: toUser(data.user),
+        user: toUser(user),
       };
     }),
 

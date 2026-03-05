@@ -1,5 +1,5 @@
-import '@/index.css';
 import { AuthInit } from '@/components/AuthInit';
+import '@/index.css';
 import { router } from '@/routes/config';
 import { useAuthStore } from '@/stores/auth.store';
 import { trpc } from '@/trpc/client';
@@ -28,7 +28,7 @@ const trpcClient = trpc.createClient({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Theme>
+    <Theme hasBackground={false}>
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <AuthInit />
