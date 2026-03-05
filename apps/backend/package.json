@@ -9,7 +9,13 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write '**/*.{ts,json}'",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "db:init": "pnpm exec supabase init",
+    "db:link": "pnpm exec supabase link",
+    "db:push": "pnpm exec supabase db push",
+    "db:reset": "pnpm exec supabase db reset",
+    "db:migration": "pnpm exec supabase migration new",
+    "db:status": "pnpm exec supabase migration list"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",
@@ -30,6 +36,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.1",
+    "supabase": "^2.76.16",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.56.1"

@@ -32,3 +32,6 @@ coverage/
 
 # Optional: локальные настройки
 *.local
+
+apps/backend/supabase/.branches
+apps/backend/supabase/.temp
