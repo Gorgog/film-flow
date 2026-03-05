@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./trpc": "./src/trpc/root.ts"
+  },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "start": "node -r tsconfig-paths/register dist/index.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write '**/*.{ts,json}'",
-    "start": "node dist/index.js",
     "db:init": "pnpm exec supabase init",
     "db:link": "pnpm exec supabase link",
     "db:push": "pnpm exec supabase db push",
@@ -18,12 +22,15 @@
     "db:status": "pnpm exec supabase migration list"
   },
   "dependencies": {
+    "@film-flow/shared": "workspace:*",
     "@supabase/supabase-js": "^2.98.0",
+    "@trpc/server": "^11.11.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "express-rate-limit": "^8.2.1",
-    "helmet": "^8.1.0"
+    "helmet": "^8.1.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",
@@ -38,6 +45,8 @@
     "prettier": "^3.8.1",
     "supabase": "^2.76.16",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.56.1"
   }
