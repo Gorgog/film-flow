@@ -10,8 +10,10 @@ import helmet from 'helmet';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
-app.use(cors({ origin: FRONTEND_ORIGIN }));
+const corsOrigins = process.env.FRONTEND_ORIGIN
+  ? process.env.FRONTEND_ORIGIN.split(',').map((o) => o.trim())
+  : ['http://localhost:5173'];
+app.use(cors({ origin: corsOrigins }));
 app.use(helmet());
 app.use(
   rateLimit({
