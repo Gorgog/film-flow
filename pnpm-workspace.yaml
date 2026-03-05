@@ -1,3 +1,7 @@
 packages:
-  - 'apps/**'         # все подпапки в apps/ (frontend, backend и т.д.)
-  - 'packages/**'     # если потом добавишь shared-библиотеки (опционально)
+  - apps/**
+  - packages/**
+
+ignoredBuiltDependencies:
+  - esbuild
+  - supabase
