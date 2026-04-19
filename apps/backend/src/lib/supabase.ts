@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import type { Database } from './database.types';
 
 dotenv.config(); // загружает .env
 
@@ -10,6 +11,6 @@ if (!supabaseUrl || !supabaseSecretKey) {
   throw new Error('Supabase URL или Secret Key не найдены в .env');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseSecretKey, {
+export const supabase = createClient<Database>(supabaseUrl, supabaseSecretKey, {
   auth: { autoRefreshToken: false, persistSession: false }, // для сервера
 });
