@@ -9,4 +9,12 @@ export {
   updateUserMovieSchema,
   userMovieStatusSchema,
 } from './movies/schemas';
-export type { User } from './types';
+
+// Types
+export type {
+  IMovie,
+  ITmdbMovie,
+  IUserMovie,
+  TFilmFlowMovie,
+  TUserMovieStatus,
+} from './movies/type';

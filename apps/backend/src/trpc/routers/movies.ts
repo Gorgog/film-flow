@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { fetchDetails, ITmdbMovieCache, searchMulti } from '@/lib/tmdb';
 import { protectedProcedure, router } from '@/trpc/trpc';
 import {
   addToMyListSchema,
@@ -7,7 +8,6 @@ import {
   searchMoviesSchema,
   updateUserMovieSchema,
 } from '@film-flow/shared';
-import { Movie } from '@film-flow/shared/types';
 import { TRPCError } from '@trpc/server';
 
 export const moviesRouter = router({
@@ -57,15 +57,36 @@ export const moviesRouter = router({
       if (existing) {
         movieId = existing.id;
       } else {
+        let details: ITmdbMovieCache | null = null;
+
+        try {
+          details = await fetchDetails(input.tmdbId, input.mediaType);
+        } catch (error) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Не удалось загрузить данные с TMDB',
+          });
+        }
+
+        if (details === null) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Контент не найден в TMDB',
+          });
+        }
+
         const { data: newMovie, error: insertError } = await supabase
           .from('movies')
           .insert({
             tmdb_id: input.tmdbId,
             media_type: input.mediaType,
-            title: input.title,
-            year: input.year ?? null,
-            poster_url: input.posterUrl ?? null,
-            overview: input.overview ?? null,
+            title: details.title,
+            year: details.year,
+            poster_url: details.posterUrl,
+            overview: details.overview,
           })
           .select('id')
           .single();
@@ -76,6 +97,7 @@ export const moviesRouter = router({
             message: insertError.message,
           });
         }
+
         movieId = newMovie.id;
       }
 
@@ -173,50 +195,15 @@ export const moviesRouter = router({
 
   searchMovies: protectedProcedure
     .input(searchMoviesSchema)
-    .query(async (ctx, input) => {
-      const apiKey = process.env.TMDB_API_KEY;
-      if (!apiKey) {
+    .query(async ({ ctx, input }) => {
+      try {
+        const hits = await searchMulti(input.query);
+        return hits;
+      } catch (error) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'TMDB API Key is not set',
+          message: error instanceof Error ? error.message : 'Unknown error',
         });
       }
-
-      const url = new URL('https://api.themoviedb.org/3/search/multi');
-      url.searchParams.set('api_key', apiKey);
-      url.searchParams.set('query', input.query);
-      url.searchParams.set('language', 'ru-RU');
-
-      const response = await fetch(url.toString());
-      if (!response.ok) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to search movies',
-        });
-      }
-
-      const json = (await response.json()) as { results: Movie[] };
-
-      const results = json.results ?? [];
-      return results
-        .filter(
-          (r) =>
-            (r.media_type === 'movie' || r.media_type === 'tv') &&
-            (r.title ?? r.name)
-        )
-        .map((r) => ({
-          tmdbId: r.id,
-          mediaType: r.media_type === 'tv' ? 'series' : 'movie',
-          title: r.title ?? r.name ?? '',
-          year:
-            parseInt(
-              (r.release_date ?? r.first_air_date ?? '').slice(0, 4),
-              10
-            ) || null,
-          posterUrl: r.poster_path
-            ? `https://image.tmdb.org/t/p/w200${r.poster_path}`
-            : null,
-          overview: r.overview ?? null,
-        }));
     }),
 });

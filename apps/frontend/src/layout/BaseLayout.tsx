@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 export function BaseLayout() {
   return (
-    <Container>
+    <Container className="!justify-between items-start py-4">
       <Outlet />
     </Container>
   );

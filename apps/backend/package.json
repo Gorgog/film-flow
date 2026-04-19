@@ -19,7 +19,8 @@
     "db:push": "pnpm exec supabase db push",
     "db:reset": "pnpm exec supabase db reset",
     "db:migration": "pnpm exec supabase migration new",
-    "db:status": "pnpm exec supabase migration list"
+    "db:status": "pnpm exec supabase migration list",
+    "db:types": "pnpm exec supabase gen types typescript --linked > src/lib/database.types.ts"
   },
   "dependencies": {
     "@film-flow/shared": "workspace:*",

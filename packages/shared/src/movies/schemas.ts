@@ -15,10 +15,6 @@ const getMyListSchema = z
 const addToMyListSchema = z.object({
   tmdbId: z.number(),
   mediaType: mediaTypeSchema,
-  title: z.string().min(1),
-  year: z.number().nullable().optional(),
-  posterUrl: z.string().nullable().optional(),
-  overview: z.string().nullable().optional(),
 });
 
 const updateUserMovieSchema = z.object({
